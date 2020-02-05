@@ -1,0 +1,323 @@
+#----This is the track text for the first Unix Exercises-- LUIS MARIO LEAL GARZA 
+# You can scroll down or ctrl+f "7. HOMEWORK", read everything or whatever you prefer
+# Also, TLDR:
+#### Answers for 7. HOMEWORK
+# 7.1: 681 genes in Chromosome II in Saccharomyces cerevisiae R64
+# 7.2: 38.15% GC content in S288C ref sequence R64
+# 7.3.a: 39.53% GC content in Y55
+# 7.3.b: 5330 ORFs in Y55 strain
+# 7.3.c: 5168 shared ORFs, 162 ORFs unique to Y55, 1545 ORFs unique to Ref
+
+# 1. Managing Files
+
+wget https://downloads.yeastgenome.org/sequence/S288C_reference/genome_releases/S288C_reference_genome_Current_Release.tgz
+# This downloaded a reference yeast genome compressed file
+# Output: S288C_reference_genome_Current_Release.tgz file
+
+tar -xzvf S288C_reference_genome_Current_Release.tgz
+# tar is used to decompress and -xzvf is specific for .tgz decompressing into a new directory
+# Output: New directory called S288C_reference_genome_R64-2-1_20150113
+
+ls
+# Gives me a list of whatever is in my current directory
+# Output: S288C_reference_genome_Current_Release.tgz S288C_reference_genome_R64-2-1_20150113
+
+ls -l S288C_reference_genome_R64-2-1_20150113
+# This is just to see what is in the new dir that came from the compressed file
+# Output: total 67776
+#-rw-r--r-- 1 fburic students  3609953 Jan 13  2015 NotFeature_R64-2-1_20150113.fasta
+#-rw-r--r-- 1 fburic students 12361395 Jan 13  2015 S288C_reference_sequence_R64-2-1_20150113.fsa
+#-rw-r--r-- 1 fburic students 17633737 Jan 13  2015 gene_association_R64-2-1_20150113.sgd
+#-rw-r--r-- 1 fburic students 11491336 Jan 13  2015 orf_coding_all_R64-2-1_20150113.fasta
+#-rw-r--r-- 1 fburic students  5328465 Jan 13  2015 orf_trans_all_R64-2-1_20150113.fasta
+#-rw-r--r-- 1 fburic students   814529 Jan 13  2015 other_features_genomic_R64-2-1_20150113.fasta
+#-rw-r--r-- 1 fburic students   182615 Jan 13  2015 rna_coding_R64-2-1_20150113.fasta
+#-rw-r--r-- 1 fburic students 17967332 Jan 13  2015 saccharomyces_cerevisiae_R64-2-1_20150113.gff
+
+mv S288C_reference_genome_R64-2-1_20150113 data
+# Moves the previous dir into a new dir with a new name (so its just renaming)
+# Output: Previous dir changes name into a new dir named data
+
+pwd
+# Shows where we are (current dir)
+# Output: /home/student2
+
+cd data
+# moves to data dir
+
+less rna_coding_R64-2-1_20150113.fasta
+# inspects file in an easy-to-close display (quit by pressing q)
+
+cd ..
+# Moves current dir to the previous one
+
+mkdir results
+# Makes a new dir called results
+
+touch results/counts.txt
+# Creates a file named counts.txt if it already exists it just changes its last date of accession (updates it)
+# Output: counts.txt 
+
+mv results results_2020_01_28
+# moves (changes name)
+
+# 2. Analyzing files
+# 2.1
+cd data
+# changes current dir to data
+
+wc -l orf_coding_all_R64-2-1_20150113.fasta
+# Counts lines in file
+# 161265
+ 
+wc -l orf_trans_all_R64-2-1_20150113.fasta
+# 60443
+
+#2.2
+less orf_coding_all_R64-2-1_20150113.fasta
+# First inspecting a file is good to know how to work on it
+grep "^[>]" orf_coding_all_R64-2-1_20150113.fasta | less
+# To count genes in orf_coding_all_R64-2-1_20150113.fasta we can count the amount of lines by greping for the start symbol of fasta format >
+grep -c "^[>]" orf_coding_all_R64-2-1_20150113.fasta 
+# Then we just add -c to the grep command to count
+# Output: 6713
+
+#2.3
+grep -c "^[>]" orf_coding_all_R64-2-1_20150113.fasta > results_2019_01_22/counts.txt
+# saves previous output into a file
+
+#2.4
+less rna_coding_R64-2-1_20150113.fasta
+# To count tRNA genes we first inspect the file, tRNA is repeated in each line several times, but tRNA_gene is used just once
+
+grep -c "tRNA_gene" rna_coding_R64-2-1_20150113.fasta
+# Gives number of tRNA genes 
+# Output: 299
+
+#2.5
+grep -c "tRNA_gene" rna_coding_R64-2-1_20150113.fasta >> results_2020_01_28/counts.txt
+# Adds the result of this to counts.txt file in a new line
+# Output: counts.txt
+
+#2.6 
+cat results_2020_01_28/counts.txt
+# display of the counts file in the bash
+
+#2.7 
+cp counts.txt counts.txt.orig
+# Copies file 1 into file 2
+
+# 3. Working with text columns
+
+cd ..
+# move to home directory
+
+mkdir ex3
+# makes new directory for exercise 3
+
+cd ex3
+# moves to dir ex3
+
+# gene experssion data (fold change)
+wget https://web.archive.org/web/20130211035221/http://www.cbs.dtu.dk/courses/27619/ex1.dat
+# downloads file into actual dir
+
+# annotation
+wget https://web.archive.org/web/20170706124217/http://www.cbs.dtu.dk/courses/27619/ex1.acc
+# downloads file into actual dir
+
+paste ex1.acc ex1.dat 
+# pastes data column-wise
+
+# 4. Counting yeast-human orthologs
+
+cd ..
+# moves back to home
+
+mkdir ex4
+# makes new dir for this exercise
+
+cd ex4
+# moves to it
+
+wget http://eggnog5.embl.de/download/eggnog_5.0/per_tax_level/2759/2759_members.tsv.gz
+# downloads file
+gunzip 2759_members.tsv.gz
+# decompresses file and erases the compressed one
+
+grep "4891." 2759_members.tsv | cut -f 2 | sort > groups_scerevisiae.txt
+# first gets group of genes in the Saccharomyces, then cuts out (keeps) 2nd column (group of genes ID), then sorts into a new file
+grep "9606." 2759_members.tsv | cut -f 2 | sort > groups_hsapiens.txt
+# first gets group of genes in the Human, then cuts out (keeps) 2nd column (group of genes ID), then sorts into a new file
+
+# QUESTION
+# . was used after the Ids because it could be that 4891 appears elsewhere followed by other stuff, we dont want those
+
+less -S groups_hsapiens.txt
+# we see a huge list of groupgenes present in human taxons
+
+comm -12 groups_hsapiens.txt groups_scerevisiae.txt | wc -l
+# brings back common stuff between both files then counts lines (elements only in 1 and only in 2 are omitted by -12)
+# Output: 838
+
+comm -12 <(grep "4891." 2759_members.tsv | cut -f 2 | sort) <(grep "9606." 2759_members.tsv | cut -f 2 | sort) | wc -l
+# <(code or whatever) helps to create a pseudofile when commands require a file (less steps!)
+
+# 5. Sequence Processing
+
+# tr "A" "C" < FILE.fasta | less
+# could be used to make As into Cs, but cant be used for further single replacements, so no do
+
+# sed 'y/ACGT/UGCA/' FILE > FILE_RNA
+# this would work better, BUT still does substitutions into headers
+
+# sed '/^>/!y/ACGT/UGCA/' FILE.fasta > FILE_RNA.fasta
+# this would be the best for transcription purposes
+
+# 6. Bonus comands
+# ...
+#
+#
+
+# 7. HOMEWORK
+
+# Task 7.1: How many genes are on chromosome II in:
+pwd
+# to see in which dir we are
+
+cd data
+# to move to the dir where we have the data
+
+less saccharomyces_cerevisiae_R64-2-1_20150113.gff
+# Inspection of the file to understand how to count genes in chromosome II
+
+grep -c "chrII$(printf '\t')SGD$(printf '\t')gene" saccharomyces_cerevisiae_R64-2-1_20150113.gff
+# This was the first attempt, but didnt work quite fine, as it was ignoring any gene like tRNA_gene or trasposable_gene etc... the query was too specific!
+
+grep "chrII" saccharomyces_cerevisiae_R64-2-1_20150113.gff | less
+# Instead I first separate everything that comes from chromosome II
+# Elements as chromosome, CDS, gene, and more things from chromosome II are shown
+
+
+grep "chrII" saccharomyces_cerevisiae_R64-2-1_20150113.gff | grep "gene" | less
+# This gets only the lines with "gene" elements from the chromosome II but if the word "gene" appears even if it is not a gene it will show up
+
+grep "chrII" saccharomyces_cerevisiae_R64-2-1_20150113.gff | cut -f 3 | grep "gene" | less
+# This restructs the search of "gene" only to column 3, which describes the element 
+# This now includes gene pseudogene, tRNA_gene, transposable_element_gene, snoRNA_gene, which were ignored in my first attempt (not just "gene")
+
+grep "chrII" saccharomyces_cerevisiae_R64-2-1_20150113.gff | cut -f 3 | grep "gene" | wc -l
+# This finally counts what we want
+# Output: 681
+
+# Task 7.2: GC content
+
+grep "^[^>;]" S288C_reference_sequence_R64-2-1_20150113.fsa | less
+# brings every line but not the fasta titles and inspect
+# if im counting G and C nucleotides dont want any "C"s or "G"s from the header to be included
+
+grep -o "C" S288C_reference_sequence_R64-2-1_20150113.fsa | less
+# here we are just experimenting on how "-o" works, it brings only the character not the whole line where it appears
+
+grep "^[^>;]" S288C_reference_sequence_R64-2-1_20150113.fsa | grep -o "C" | wc -l
+# first greps just nucleotides (no title) then greps just "C"s, finally it counts them
+# Output: 2320576
+
+grep "^[^>;]" S288C_reference_sequence_R64-2-1_20150113.fsa | grep -o "G" | wc -l
+#same as above but for "G"s
+# Output: 2317100
+
+grep "^[^>;]" S288C_reference_sequence_R64-2-1_20150113.fsa | grep -o "A" | wc -l
+#same as above but for "A"s
+# Output: 3766349
+
+grep "^[^>;]" S288C_reference_sequence_R64-2-1_20150113.fsa | grep -o "T" | wc -l
+#same as above but for "T"s
+# Output: 3753080
+
+grep "^[^>;]" S288C_reference_sequence_R64-2-1_20150113.fsa | wc -m
+# counts all characters, hopefully it will match with total nucleotides
+# Output: 12359733 
+# Didnt match! sum of nucleotides is just 12157105
+# I guess "enters" or new lines could be counted as characters, so lets count lines
+
+grep "^[^>;]" S288C_reference_sequence_R64-2-1_20150113.fsa | wc -l
+# Output: 202628
+# It now makes sense, nucleotide sum + enters (number of lines) = total character count
+
+# So GC content would be (4637676)/12157105 = 38.15%
+
+# Task 7.3: Download and decompress the ORFs of another strain
+wget https://downloads.yeastgenome.org/sequence/strains/Y55/Y55_SGD_2015_JRIF00000000/Y55_JRIF00000000_SGD_cds.fsa.gz
+# downloads file
+
+gunzip Y55_JRIF00000000_SGD_cds.fsa.gz
+# decompresses and erases compressed file
+
+Task 7.3.a: Compare GC content with the task above
+less Y55_JRIF00000000_SGD_cds.fsa
+# Inspecting to see if I can use the same logic as previously
+# yes i can
+
+grep "^[^>;]" Y55_JRIF00000000_SGD_cds.fsa | grep -o "C" | wc -l
+# greps nucleotides, greps then just Cs, then counts them
+# Output: 1533588
+grep "^[^>;]" Y55_JRIF00000000_SGD_cds.fsa | grep -o "G" | wc -l
+# greps nucleotides, greps then just Gs, then counts them
+# Output: 1658347
+grep "^[^>;]" Y55_JRIF00000000_SGD_cds.fsa | grep -o "T" | wc -l
+# greps nucleotides, greps then just Ts, then counts them
+# Output: 2232804
+grep "^[^>;]" Y55_JRIF00000000_SGD_cds.fsa | grep -o "A" | wc -l
+# greps nucleotides, greps then just As, then counts them
+# Output: 2649091
+grep "^[^>;]" Y55_JRIF00000000_SGD_cds.fsa | wc -m
+# greps nucleotides, then counts them
+# Output: 8242948
+grep "^[^>;]" Y55_JRIF00000000_SGD_cds.fsa | wc -l
+# greps nucleotides, then counts lines
+# Output:164290
+# just to cross check like in the previous exercise
+#So GC content would be (3191935)/8073830 = 39.53%
+
+# Task 7.3.b: Compare ORF number in Y55 strain
+grep "^[>]" Y55_JRIF00000000_SGD_cds.fsa | wc -l
+# Grep the lines starting with >, so the headers of each fasta entry
+# Output: 5330
+
+# Task 7.3.c: Count common ORFs between Y55 and reference strain
+
+less orf_coding_all_R64-2-1_20150113.fasta
+# Inspect reference file to see how can i analyze it
+
+grep "^[>]" orf_coding_all_R64-2-1_20150113.fasta | less
+# I get just the headers to count ORFs
+grep "^[>]" orf_coding_all_R64-2-1_20150113.fasta | wc -l
+# Output: 6713
+
+# To compare ORFs I need to get the Identifiers out, those are within the first characters of the header of the fasta entry
+# I need to see if I can use cut for this...
+man cut
+# Ok, yes I can, -c cuts characters, so I'm cutting from 2 to 8...
+
+grep "^[>]" Y55_JRIF00000000_SGD_cds.fsa | cut -c 2-8 | less
+# This now shows me just the IDs without the > sign but also without the "_Y55" thing
+
+grep "^[>]" orf_coding_all_R64-2-1_20150113.fasta | cut -c 2-8 | less
+# I think this could be limited, as some names had a longer ID, but this is what I tried
+
+comm -12 <(grep "^[>]" Y55_JRIF00000000_SGD_cds.fsa | cut -c 2-8 ) <(grep "^[>]" orf_coding_all_R64-2-1_20150113.fasta | cut -c 2-8) | wc -l
+# I create some pseudofiles with what i did above
+# shows an error, apparently I have to sort before
+# tried this but got only 56 and the message that files were not sorted, so I sort them
+
+comm -12 <(grep "^[>]" Y55_JRIF00000000_SGD_cds.fsa | cut -c 2-8 | sort)  <(grep "^[>]" orf_coding_all_R64-2-1_20150113.fasta | cut -c 2-8 | sort) | wc -l
+# Now they are sorted!
+# Output: shared 5168
+
+comm -13 <(grep "^[>]" Y55_JRIF00000000_SGD_cds.fsa | cut -c 2-8 | sort)  <(grep "^[>]" orf_coding_all_R64-2-1_20150113.fasta | cut -c 2-8 | sort) | wc -l
+# Output: unique to Ref 1545
+
+comm -23 <(grep "^[>]" Y55_JRIF00000000_SGD_cds.fsa | cut -c 2-8 | sort)  <(grep "^[>]" orf_coding_all_R64-2-1_20150113.fasta | cut -c 2-8 | sort) | wc -l
+# Output: unique to Y55 162
+
